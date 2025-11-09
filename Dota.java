@@ -1,37 +1,31 @@
-package oop;
-
 public class Dota {
     public static void main(String[] args) {
         Unit hero = new Hero(1500, 10, 10);
-        Unit creep = new Creep(500, 8, 8,false);
-        Unit creep2 = new Creep(500, 8, 8,false);
-        Unit creep3 = new Creep(500, 8, 8,false);
-        Unit creep4 = new Creep(500, 8, 8,false);
-        Tower t3 = new Tier3Tower(false);
-        Tower t4 = new Tier3Tower(false);
-
-        Unit[] units={hero,creep,creep2,creep3,creep4};
+        Unit creep = new Creep(500, 8, 8, false);
+        Unit creep2 = new Creep(500, 8, 8, false);
+        Unit creep3 = new Creep(500, 8, 8, false);
+        Unit creep4 = new Creep(500, 8, 8, false);
+        Tower t3 = new EnhancedTower(170, 16, 15, 15, true);
+        Tower t4 = new EnhancedTower(174, 21, 15, 15, true);
+        Tower t1 = new Tower(100, 10, 15, 15);
+        Unit[] units = {hero, creep, creep2, creep3, creep4};
         Unit.moveUnit(hero, 16, 16);
         Unit.moveUnit(creep, 16, 16);
         Unit.moveUnit(creep2, 16, 16);
         Unit.moveUnit(creep3, 16, 16);
         Unit.moveUnit(creep4, 16, 16);
-        t3.attack(units);
-        t3.attack(units);
-        t3.attack(units);
-        t3.attack(units);
-        t3.attack(units);
-        System.out.println(hero.getHP()+ " "+ creep.getHP()+" " +creep2.getHP()+" " +creep3.getHP()+" " +creep4.getHP());
-
-
+        t1.attack(units);
+        t1.attack(units);
+        t1.attack(units);
+        System.out.println(hero.getHP() + " " + creep.getHP() + " " + creep2.getHP() + " " + creep3.getHP() + " " + creep4.getHP());
     }
 }
 
-abstract class Tower {
-    protected final int DAMAGE;
-    private final int ARMOR;
-    private final int xCoordinate;
-    private final int yCoordinate;
+class Tower {
+    protected int DAMAGE;
+    protected int ARMOR;
+    protected int xCoordinate;
+    protected int yCoordinate;
     private final int RADIUS = 3;
     protected boolean isGlyphActive;
     protected int hits;
@@ -44,13 +38,24 @@ abstract class Tower {
     }
 
     public boolean inRadius(Unit target) {
-        return xCoordinate - RADIUS <= target.getxCooordinate() && target.getxCooordinate() <= xCoordinate + RADIUS && 
+        return xCoordinate - RADIUS <= target.getxCooordinate() && target.getxCooordinate() <= xCoordinate + RADIUS &&
                 yCoordinate - RADIUS <= target.getyCoordinate() && target.getyCoordinate() <= yCoordinate + RADIUS;
     }
 
     public void attack(Unit[] units) {
+        for (Unit unit : units) {
+            if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
+                unit.takeDamage(DAMAGE);
+                return;
+            }
+        }
+        for (Unit unit : units) {
+            if (inRadius(unit) && unit instanceof Hero) {
+                unit.takeDamage(DAMAGE);
+                return;
+            }
+        }
     }
-
 
 
     public int getRADIUS() {
@@ -58,9 +63,9 @@ abstract class Tower {
     }
 }
 
-class Tier3Tower extends Tower {
-    public Tier3Tower(boolean isGlyphActive) {
-        super(170, 16, 15, 15);
+class EnhancedTower extends Tower {
+    public EnhancedTower(int DAMAGE, int ARMOR, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
+        super(DAMAGE, ARMOR, xCoordinate, yCoordinate);
         this.isGlyphActive = isGlyphActive;
     }
 
@@ -69,12 +74,10 @@ class Tier3Tower extends Tower {
         if (isGlyphActive) {
             for (Unit unit : units) {
                 if (inRadius(unit)) {
-                    {
-                        unit.takeDamage(DAMAGE);
-                        hits++;
-                        if (hits == 3) {
-                            break;
-                        }
+                    unit.takeDamage(DAMAGE);
+                    hits++;
+                    if (hits == 3) {
+                        break;
                     }
                 }
             }
@@ -95,41 +98,6 @@ class Tier3Tower extends Tower {
     }
 }
 
-class Tier4Tower extends Tower {
-    public Tier4Tower(boolean isGlyphActive) {
-        super(174, 21, 25, 25);
-        this.isGlyphActive = isGlyphActive;
-    }
-    @Override
-    public void attack(Unit[] units) {
-        if (isGlyphActive) {
-            for (Unit unit : units) {
-                if (inRadius(unit)) {
-                    {
-                        unit.takeDamage(DAMAGE);
-                        hits++;
-                        if (hits == 3) {
-                            break;
-                        }
-                    }
-                }
-            }
-        } else {
-            for (Unit unit : units) {
-                if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) { 
-                    unit.takeDamage(DAMAGE);
-                    return;
-                }
-            }
-            for (Unit unit : units) {
-                if (inRadius(unit) && unit instanceof Hero) {
-                    unit.takeDamage(DAMAGE);
-                    return;
-                }
-            }
-        }
-    }
-}
 
 abstract class Unit {
     private int HP;
@@ -144,6 +112,7 @@ abstract class Unit {
         this.yCoordinate = yCoordinate;
         this.direction = direction;
     }
+
     public boolean isDead() {
         return getHP() == 0;
     }
@@ -208,7 +177,6 @@ abstract class Unit {
     }
 
 
-
     public static void unitDirection(Unit unit, Direction direction) {
         while (unit.getDirection() != direction) {
             unit.turnRight();
@@ -250,8 +218,8 @@ abstract class Unit {
 }
 
 class Creep extends Unit {
-    public Creep(int HP, int xCoordinate, int yCoordinate,Boolean isActive ) {
-        super(HP,xCoordinate ,yCoordinate, Direction.RIGHT);
+    public Creep(int HP, int xCoordinate, int yCoordinate, Boolean isActive) {
+        super(HP, xCoordinate, yCoordinate, Direction.RIGHT);
         this.isActive = isActive;
     }
 
@@ -273,7 +241,6 @@ class Hero extends Unit {
     }
 
 
-
     public void takeDamage(int damage) {
         setHP(Math.max(0, getHP() - damage));
         if (isDead()) {
@@ -283,7 +250,7 @@ class Hero extends Unit {
     }
 
 }
-// while(unitxcoord!=toX||unitycoord!=){}
+
 
 
 
