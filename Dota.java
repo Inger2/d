@@ -4,35 +4,37 @@ public class Dota {
     public static void main(String[] args) {
         Unit hero = new Hero(1500, 10, 10);
         Unit creep = new Creep(500, 8, 8,false);
+        Unit creep2 = new Creep(500, 8, 8,false);
+        Unit creep3 = new Creep(500, 8, 8,false);
+        Unit creep4 = new Creep(500, 8, 8,false);
         Tower t3 = new Tier3Tower(false);
+        Tower t4 = new Tier3Tower(false);
 
-        Unit[] units={hero,creep};
-        t3.attack(units);
-        System.out.println("хп героя: " +hero.getHP()+" Его x координата: " + hero.getxCooordinate() + " Его y координата: " + hero.getyCoordinate());
-        System.out.println("хп крипа " + creep.getHP()+" Его x координата: " + creep.getxCooordinate() + " Его y координата: " + creep.getyCoordinate());
+        Unit[] units={hero,creep,creep2,creep3,creep4};
         Unit.moveUnit(hero, 16, 16);
         Unit.moveUnit(creep, 16, 16);
-        t3.attack(units);
-        System.out.println("хп героя: " +hero.getHP()+" Его x координата: " + hero.getxCooordinate() + " Его y координата: " + hero.getyCoordinate());
-        System.out.println("хп крипа " + creep.getHP()+" Его x координата: " + creep.getxCooordinate() + " Его y координата: " + creep.getyCoordinate());
-        t3.attack(units);
-        t3.attack(units);
-        System.out.println("хп героя: " +hero.getHP()+" Его x координата: " + hero.getxCooordinate() + " Его y координата: " + hero.getyCoordinate());
-        System.out.println("хп крипа " + creep.getHP()+" Его x координата: " + creep.getxCooordinate() + " Его y координата: " + creep.getyCoordinate());
-        Unit.moveUnit(hero, 10, 10);
+        Unit.moveUnit(creep2, 16, 16);
+        Unit.moveUnit(creep3, 16, 16);
+        Unit.moveUnit(creep4, 16, 16);
         t3.attack(units);
         t3.attack(units);
-        System.out.println("хп героя: " +hero.getHP()+" Его x координата: " + hero.getxCooordinate() + " Его y координата: " + hero.getyCoordinate());
+        t3.attack(units);
+        t3.attack(units);
+        t3.attack(units);
+        System.out.println(hero.getHP()+ " "+ creep.getHP()+" " +creep2.getHP()+" " +creep3.getHP()+" " +creep4.getHP());
+
+
     }
 }
 
 abstract class Tower {
-    private final int DAMAGE;
+    protected final int DAMAGE;
     private final int ARMOR;
     private final int xCoordinate;
     private final int yCoordinate;
     private final int RADIUS = 3;
     protected boolean isGlyphActive;
+    protected int hits;
 
     public Tower(int DAMAGE, int ARMOR, int xCoordinate, int yCoordinate) {
         this.DAMAGE = DAMAGE;
@@ -47,11 +49,33 @@ abstract class Tower {
     }
 
     public void attack(Unit[] units) {
+    }
+
+
+
+    public int getRADIUS() {
+        return RADIUS;
+    }
+}
+
+class Tier3Tower extends Tower {
+    public Tier3Tower(boolean isGlyphActive) {
+        super(170, 16, 15, 15);
+        this.isGlyphActive = isGlyphActive;
+    }
+
+    @Override
+    public void attack(Unit[] units) {
         if (isGlyphActive) {
             for (Unit unit : units) {
-
                 if (inRadius(unit)) {
-                    unit.takeDamage(DAMAGE);
+                    {
+                        unit.takeDamage(DAMAGE);
+                        hits++;
+                        if (hits == 3) {
+                            break;
+                        }
+                    }
                 }
             }
         } else {
@@ -69,26 +93,41 @@ abstract class Tower {
             }
         }
     }
-
-
-
-    public int getRADIUS() {
-        return RADIUS;
-    }
-}
-
-class Tier3Tower extends Tower {
-    public Tier3Tower(boolean isGlyphActive) {
-        super(170, 16, 15, 15);
-        this.isGlyphActive = isGlyphActive;
-    }
-
 }
 
 class Tier4Tower extends Tower {
     public Tier4Tower(boolean isGlyphActive) {
         super(174, 21, 25, 25);
         this.isGlyphActive = isGlyphActive;
+    }
+    @Override
+    public void attack(Unit[] units) {
+        if (isGlyphActive) {
+            for (Unit unit : units) {
+                if (inRadius(unit)) {
+                    {
+                        unit.takeDamage(DAMAGE);
+                        hits++;
+                        if (hits == 3) {
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            for (Unit unit : units) {
+                if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) { // тут не работает
+                    unit.takeDamage(DAMAGE);
+                    return;
+                }
+            }
+            for (Unit unit : units) {
+                if (inRadius(unit) && unit instanceof Hero) {
+                    unit.takeDamage(DAMAGE);
+                    return;
+                }
+            }
+        }
     }
 }
 
@@ -245,4 +284,5 @@ class Hero extends Unit {
 
 }
 // while(unitxcoord!=toX||unitycoord!=){}
+
 
