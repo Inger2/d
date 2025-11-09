@@ -44,7 +44,7 @@ abstract class Tower {
     }
 
     public boolean inRadius(Unit target) {
-        return xCoordinate - RADIUS <= target.getxCooordinate() && target.getxCooordinate() <= xCoordinate + RADIUS && //тут не слишком ли сложное условие?
+        return xCoordinate - RADIUS <= target.getxCooordinate() && target.getxCooordinate() <= xCoordinate + RADIUS && 
                 yCoordinate - RADIUS <= target.getyCoordinate() && target.getyCoordinate() <= yCoordinate + RADIUS;
     }
 
@@ -80,7 +80,7 @@ class Tier3Tower extends Tower {
             }
         } else {
             for (Unit unit : units) {
-                if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) { // тут не работает
+                if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
                     unit.takeDamage(DAMAGE);
                     return;
                 }
@@ -116,7 +116,7 @@ class Tier4Tower extends Tower {
             }
         } else {
             for (Unit unit : units) {
-                if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) { // тут не работает
+                if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) { 
                     unit.takeDamage(DAMAGE);
                     return;
                 }
@@ -284,5 +284,6 @@ class Hero extends Unit {
 
 }
 // while(unitxcoord!=toX||unitycoord!=){}
+
 
 
