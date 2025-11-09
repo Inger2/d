@@ -15,43 +15,41 @@ public class Dota {
         Unit.moveUnit(creep3, 16, 16);
         Unit.moveUnit(creep4, 16, 16);
         t1.attack(units);
-        t1.attack(units);
-        t1.attack(units);
-        System.out.println(hero.getHP() + " " + creep.getHP() + " " + creep2.getHP() + " " + creep3.getHP() + " " + creep4.getHP());
+        System.out.println(hero.getHealthPoint() + " " + creep.getHealthPoint() + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint() + " " + creep4.getHealthPoint());
     }
 }
 
 class Tower {
-    protected int DAMAGE;
-    protected int ARMOR;
+    protected int Damage;
+    protected int Armor;
     protected int xCoordinate;
     protected int yCoordinate;
     private final int RADIUS = 3;
     protected boolean isGlyphActive;
     protected int hits;
 
-    public Tower(int DAMAGE, int ARMOR, int xCoordinate, int yCoordinate) {
-        this.DAMAGE = DAMAGE;
-        this.ARMOR = ARMOR;
+    public Tower(int Damage, int Armor, int xCoordinate, int yCoordinate) {
+        this.Damage = Damage;
+        this.Armor = Armor;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
     }
 
     public boolean inRadius(Unit target) {
-        return xCoordinate - RADIUS <= target.getxCooordinate() && target.getxCooordinate() <= xCoordinate + RADIUS &&
+        return xCoordinate - RADIUS <= target.getxCoordinate() && target.getxCoordinate() <= xCoordinate + RADIUS &&
                 yCoordinate - RADIUS <= target.getyCoordinate() && target.getyCoordinate() <= yCoordinate + RADIUS;
     }
 
     public void attack(Unit[] units) {
         for (Unit unit : units) {
             if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
-                unit.takeDamage(DAMAGE);
+                unit.takeDamage(Damage);
                 return;
             }
         }
         for (Unit unit : units) {
-            if (inRadius(unit) && unit instanceof Hero) {
-                unit.takeDamage(DAMAGE);
+            if (inRadius(unit)) {
+                unit.takeDamage(Damage);
                 return;
             }
         }
@@ -64,8 +62,8 @@ class Tower {
 }
 
 class EnhancedTower extends Tower {
-    public EnhancedTower(int DAMAGE, int ARMOR, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
-        super(DAMAGE, ARMOR, xCoordinate, yCoordinate);
+    public EnhancedTower(int Damage, int Armor, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
+        super(Damage, Armor, xCoordinate, yCoordinate);
         this.isGlyphActive = isGlyphActive;
     }
 
@@ -74,7 +72,7 @@ class EnhancedTower extends Tower {
         if (isGlyphActive) {
             for (Unit unit : units) {
                 if (inRadius(unit)) {
-                    unit.takeDamage(DAMAGE);
+                    unit.takeDamage(Damage);
                     hits++;
                     if (hits == 3) {
                         break;
@@ -84,13 +82,13 @@ class EnhancedTower extends Tower {
         } else {
             for (Unit unit : units) {
                 if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
-                    unit.takeDamage(DAMAGE);
+                    unit.takeDamage(Damage);
                     return;
                 }
             }
             for (Unit unit : units) {
-                if (inRadius(unit) && unit instanceof Hero) {
-                    unit.takeDamage(DAMAGE);
+                if (inRadius(unit)) {
+                    unit.takeDamage(Damage);
                     return;
                 }
             }
@@ -100,32 +98,32 @@ class EnhancedTower extends Tower {
 
 
 abstract class Unit {
-    private int HP;
+    private int healthPoint;
     private int xCoordinate;
     private int yCoordinate;
     protected boolean isActive;
     private Direction direction;
 
-    public Unit(int HP, int xCoordinate, int yCoordinate, Direction direction) {
-        this.HP = HP;
+    public Unit(int healthPoint, int xCoordinate, int yCoordinate, Direction direction) {
+        this.healthPoint = healthPoint;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.direction = direction;
     }
 
     public boolean isDead() {
-        return getHP() == 0;
+        return getHealthPoint() == 0;
     }
 
     public void takeDamage(int damage) {
-        this.HP -= damage;
+        this.healthPoint -= damage;
     }
 
-    public int getHP() {
-        return HP;
+    public int getHealthPoint() {
+        return healthPoint;
     }
 
-    public int getxCooordinate() {
+    public int getxCoordinate() {
         return xCoordinate;
     }
 
@@ -133,15 +131,15 @@ abstract class Unit {
         return yCoordinate;
     }
 
-    public void setHP(int HP) {
-        this.HP = HP;
+    public void setHealthPoint(int healthPoint) {
+        this.healthPoint = healthPoint;
     }
 
     public void setyCoordinate(int yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
 
-    public void setxCooordinate(int xCoordinate) {
+    public void setxCoordinate(int xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
@@ -193,12 +191,12 @@ abstract class Unit {
     }
 
     public static void moveUnit(Unit unit, int toX, int toY) {
-        if (unit.getxCooordinate() < toX) {
+        if (unit.getxCoordinate() < toX) {
             unitDirection(unit, Unit.Direction.RIGHT);
-            moveForward(unit, toX - unit.getxCooordinate());
-        } else if (unit.getxCooordinate() > toX) {
+            moveForward(unit, toX - unit.getxCoordinate());
+        } else if (unit.getxCoordinate() > toX) {
             unitDirection(unit, Unit.Direction.LEFT);
-            moveForward(unit, unit.getxCooordinate() - toX);
+            moveForward(unit, unit.getxCoordinate() - toX);
         }
         if (unit.getyCoordinate() < toY) {
             unitDirection(unit, Unit.Direction.UP);
@@ -218,37 +216,35 @@ abstract class Unit {
 }
 
 class Creep extends Unit {
-    public Creep(int HP, int xCoordinate, int yCoordinate, Boolean isActive) {
-        super(HP, xCoordinate, yCoordinate, Direction.RIGHT);
+    public Creep(int healthPoint, int xCoordinate, int yCoordinate, Boolean isActive) {
+        super(healthPoint, xCoordinate, yCoordinate, Direction.RIGHT);
         this.isActive = isActive;
     }
 
 
     public void takeDamage(int damage) {
         if (isActive) {
-            getHP();
+            getHealthPoint();
         } else {
-            setHP(Math.max(0, getHP() - damage));
+            setHealthPoint(Math.max(0, getHealthPoint() - damage));
         }
     }
-
 
 }
 
 class Hero extends Unit {
-    public Hero(int HP, int xCoordinate, int yCoordinate) {
-        super(HP, xCoordinate, yCoordinate, Direction.RIGHT);
+    public Hero(int healthPoint, int xCoordinate, int yCoordinate) {
+        super(healthPoint, xCoordinate, yCoordinate, Direction.RIGHT);
     }
 
 
     public void takeDamage(int damage) {
-        setHP(Math.max(0, getHP() - damage));
+        setHealthPoint(Math.max(0, getHealthPoint() - damage));
         if (isDead()) {
-            setxCooordinate(0);
+            setxCoordinate(0);
             setyCoordinate(0);
         }
     }
-
 }
 
 
