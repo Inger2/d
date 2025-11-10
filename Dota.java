@@ -20,17 +20,17 @@ public class Dota {
 }
 
 class Tower {
-    protected int Damage;
-    protected int Armor;
+    protected int damage;
+    protected int armor;
     protected int xCoordinate;
     protected int yCoordinate;
     private final int RADIUS = 3;
     protected boolean isGlyphActive;
     protected int hits;
 
-    public Tower(int Damage, int Armor, int xCoordinate, int yCoordinate) {
-        this.Damage = Damage;
-        this.Armor = Armor;
+    public Tower(int damage, int armor, int xCoordinate, int yCoordinate) {
+        this.damage = damage;
+        this.armor = armor;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
     }
@@ -43,13 +43,13 @@ class Tower {
     public void attack(Unit[] units) {
         for (Unit unit : units) {
             if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
-                unit.takeDamage(Damage);
+                unit.takeDamage(damage);
                 return;
             }
         }
         for (Unit unit : units) {
             if (inRadius(unit)) {
-                unit.takeDamage(Damage);
+                unit.takeDamage(damage);
                 return;
             }
         }
@@ -62,8 +62,8 @@ class Tower {
 }
 
 class EnhancedTower extends Tower {
-    public EnhancedTower(int Damage, int Armor, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
-        super(Damage, Armor, xCoordinate, yCoordinate);
+    public EnhancedTower(int damage, int armor, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
+        super(damage, armor, xCoordinate, yCoordinate);
         this.isGlyphActive = isGlyphActive;
     }
 
@@ -72,7 +72,7 @@ class EnhancedTower extends Tower {
         if (isGlyphActive) {
             for (Unit unit : units) {
                 if (inRadius(unit)) {
-                    unit.takeDamage(Damage);
+                    unit.takeDamage(damage);
                     hits++;
                     if (hits == 3) {
                         break;
@@ -82,13 +82,13 @@ class EnhancedTower extends Tower {
         } else {
             for (Unit unit : units) {
                 if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
-                    unit.takeDamage(Damage);
+                    unit.takeDamage(damage);
                     return;
                 }
             }
             for (Unit unit : units) {
                 if (inRadius(unit)) {
-                    unit.takeDamage(Damage);
+                    unit.takeDamage(damage);
                     return;
                 }
             }
@@ -101,7 +101,7 @@ abstract class Unit {
     private int healthPoint;
     private int xCoordinate;
     private int yCoordinate;
-    protected boolean isActive;
+    protected boolean isGlyphActive;
     private Direction direction;
 
     public Unit(int healthPoint, int xCoordinate, int yCoordinate, Direction direction) {
@@ -216,14 +216,14 @@ abstract class Unit {
 }
 
 class Creep extends Unit {
-    public Creep(int healthPoint, int xCoordinate, int yCoordinate, Boolean isActive) {
+    public Creep(int healthPoint, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
         super(healthPoint, xCoordinate, yCoordinate, Direction.RIGHT);
-        this.isActive = isActive;
+        this.isGlyphActive = isGlyphActive;
     }
 
-
+    @Override
     public void takeDamage(int damage) {
-        if (isActive) {
+        if (isGlyphActive) {
             getHealthPoint();
         } else {
             setHealthPoint(Math.max(0, getHealthPoint() - damage));
@@ -237,7 +237,7 @@ class Hero extends Unit {
         super(healthPoint, xCoordinate, yCoordinate, Direction.RIGHT);
     }
 
-
+    @Override
     public void takeDamage(int damage) {
         setHealthPoint(Math.max(0, getHealthPoint() - damage));
         if (isDead()) {
@@ -246,6 +246,7 @@ class Hero extends Unit {
         }
     }
 }
+
 
 
 
