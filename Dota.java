@@ -14,19 +14,35 @@ public class Dota {
         Unit.moveUnit(creep2, 16, 16);
         Unit.moveUnit(creep3, 16, 16);
         Unit.moveUnit(creep4, 16, 16);
-        t1.attack(units);
+        t4.attack(units);
         System.out.println(hero.getHealthPoint() + " " + creep.getHealthPoint() + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint() + " " + creep4.getHealthPoint());
     }
 }
 
 class Tower {
-    protected int damage;
-    protected int armor;
-    protected int xCoordinate;
-    protected int yCoordinate;
+    private int damage;
+    private int armor;
+    private int xCoordinate;
+    private int yCoordinate;
     private final int RADIUS = 3;
     protected boolean isGlyphActive;
     protected int hits;
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public int getxCoordinate() {
+        return xCoordinate;
+    }
+
+    public int getyCoordinate() {
+        return yCoordinate;
+    }
 
     public Tower(int damage, int armor, int xCoordinate, int yCoordinate) {
         this.damage = damage;
@@ -67,12 +83,13 @@ class EnhancedTower extends Tower {
         this.isGlyphActive = isGlyphActive;
     }
 
+
     @Override
     public void attack(Unit[] units) {
         if (isGlyphActive) {
             for (Unit unit : units) {
                 if (inRadius(unit)) {
-                    unit.takeDamage(damage);
+                    unit.takeDamage(getDamage());
                     hits++;
                     if (hits == 3) {
                         break;
@@ -82,13 +99,13 @@ class EnhancedTower extends Tower {
         } else {
             for (Unit unit : units) {
                 if (!unit.isDead() && inRadius(unit) && unit instanceof Creep) {
-                    unit.takeDamage(damage);
+                    unit.takeDamage(getDamage());
                     return;
                 }
             }
             for (Unit unit : units) {
                 if (inRadius(unit)) {
-                    unit.takeDamage(damage);
+                    unit.takeDamage(getDamage());
                     return;
                 }
             }
