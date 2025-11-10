@@ -1,12 +1,12 @@
 public class Dota {
     public static void main(String[] args) {
         Unit hero = new Hero(1500, 10, 10);
-        Unit creep = new Creep(500, 8, 8, false);
-        Unit creep2 = new Creep(500, 8, 8, false);
-        Unit creep3 = new Creep(500, 8, 8, false);
-        Unit creep4 = new Creep(500, 8, 8, false);
-        Tower t3 = new EnhancedTower(170, 16, 15, 15, true);
-        Tower t4 = new EnhancedTower(174, 21, 15, 15, true);
+        Unit creep = new Creep(500, 8, 8);
+        Unit creep2 = new Creep(500, 8, 8);
+        Unit creep3 = new Creep(500, 8, 8);
+        Unit creep4 = new Creep(500, 8, 8);
+        Tower t3 = new EnhancedTower(170, 16, 15, 15);
+        Tower t4 = new EnhancedTower(174, 21, 15, 15);
         Tower t1 = new Tower(100, 10, 15, 15);
         Unit[] units = {hero, creep, creep2, creep3, creep4};
         Unit.moveUnit(hero, 16, 16);
@@ -15,18 +15,31 @@ public class Dota {
         Unit.moveUnit(creep3, 16, 16);
         Unit.moveUnit(creep4, 16, 16);
         t4.attack(units);
+        t4.turnOnGlyph();
+        creep.turnOnGlyph();
+        t4.attack(units);
+        creep.turnOffGlyph();
+        t4.attack(units);
+        t4.attack(units);
         System.out.println(hero.getHealthPoint() + " " + creep.getHealthPoint() + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint() + " " + creep4.getHealthPoint());
     }
 }
 
-class Tower {
+interface Glyph {
+    void turnOnGlyph();
+
+    void turnOffGlyph();
+
+    boolean isGlyphActive();
+}
+
+class Tower implements Glyph {
     private int damage;
     private int armor;
     private int xCoordinate;
     private int yCoordinate;
     private final int RADIUS = 3;
-    protected boolean isGlyphActive;
-    protected int hits;
+    protected boolean glyphActive;
 
     public int getDamage() {
         return damage;
@@ -44,6 +57,22 @@ class Tower {
         return yCoordinate;
     }
 
+    @Override
+    public boolean isGlyphActive() {
+        return glyphActive;
+    }
+
+    @Override
+    public void turnOnGlyph() {
+        glyphActive = true;
+    }
+
+    @Override
+    public void turnOffGlyph() {
+        glyphActive = false;
+    }
+
+
     public Tower(int damage, int armor, int xCoordinate, int yCoordinate) {
         this.damage = damage;
         this.armor = armor;
@@ -52,8 +81,7 @@ class Tower {
     }
 
     public boolean inRadius(Unit target) {
-        return xCoordinate - RADIUS <= target.getxCoordinate() && target.getxCoordinate() <= xCoordinate + RADIUS &&
-                yCoordinate - RADIUS <= target.getyCoordinate() && target.getyCoordinate() <= yCoordinate + RADIUS;
+        return Math.sqrt(Math.pow(xCoordinate - target.getxCoordinate(), 2) + Math.pow(yCoordinate - target.getyCoordinate(), 2)) <= RADIUS;
     }
 
     public void attack(Unit[] units) {
@@ -71,24 +99,21 @@ class Tower {
         }
     }
 
-
-    public int getRADIUS() {
-        return RADIUS;
-    }
 }
 
-class EnhancedTower extends Tower {
-    public EnhancedTower(int damage, int armor, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
+class EnhancedTower extends Tower implements Glyph {
+    public EnhancedTower(int damage, int armor, int xCoordinate, int yCoordinate) {
         super(damage, armor, xCoordinate, yCoordinate);
-        this.isGlyphActive = isGlyphActive;
+
     }
 
 
     @Override
     public void attack(Unit[] units) {
-        if (isGlyphActive) {
+        int hits = 0;
+        if (isGlyphActive()) {
             for (Unit unit : units) {
-                if (inRadius(unit)) {
+                if (!unit.isDead() && inRadius(unit)) {
                     unit.takeDamage(getDamage());
                     hits++;
                     if (hits == 3) {
@@ -114,11 +139,11 @@ class EnhancedTower extends Tower {
 }
 
 
-abstract class Unit {
+abstract class Unit implements Glyph {
     private int healthPoint;
     private int xCoordinate;
     private int yCoordinate;
-    protected boolean isGlyphActive;
+    protected boolean glyphActive;
     private Direction direction;
 
     public Unit(int healthPoint, int xCoordinate, int yCoordinate, Direction direction) {
@@ -128,8 +153,23 @@ abstract class Unit {
         this.direction = direction;
     }
 
+    @Override
+    public boolean isGlyphActive() {
+        return glyphActive;
+    }
+
+    @Override
+    public void turnOnGlyph() {
+        glyphActive = true;
+    }
+
+    @Override
+    public void turnOffGlyph() {
+        glyphActive = false;
+    }
+
     public boolean isDead() {
-        return getHealthPoint() == 0;
+        return getHealthPoint() <= 0;
     }
 
     public void takeDamage(int damage) {
@@ -225,24 +265,18 @@ abstract class Unit {
     }
 
     public enum Direction {
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT
+        UP, DOWN, LEFT, RIGHT
     }
 }
 
-class Creep extends Unit {
-    public Creep(int healthPoint, int xCoordinate, int yCoordinate, boolean isGlyphActive) {
+class Creep extends Unit implements Glyph {
+    public Creep(int healthPoint, int xCoordinate, int yCoordinate) {
         super(healthPoint, xCoordinate, yCoordinate, Direction.RIGHT);
-        this.isGlyphActive = isGlyphActive;
     }
 
     @Override
     public void takeDamage(int damage) {
-        if (isGlyphActive) {
-            getHealthPoint();
-        } else {
+        if (!isGlyphActive()) {
             setHealthPoint(Math.max(0, getHealthPoint() - damage));
         }
     }
@@ -254,17 +288,16 @@ class Hero extends Unit {
         super(healthPoint, xCoordinate, yCoordinate, Direction.RIGHT);
     }
 
+    public void respawnInTavern() {
+        setxCoordinate(0);
+        setyCoordinate(0);
+    }
+
     @Override
     public void takeDamage(int damage) {
         setHealthPoint(Math.max(0, getHealthPoint() - damage));
         if (isDead()) {
-            setxCoordinate(0);
-            setyCoordinate(0);
+            respawnInTavern();
         }
     }
 }
-
-
-
-
-
