@@ -21,7 +21,8 @@ public class Dota {
         creep.turnOffGlyph();
         t4.attack(units);
         t4.attack(units);
-        System.out.println(hero.getHealthPoint() + " " + creep.getHealthPoint() + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint() + " " + creep4.getHealthPoint());
+        System.out.println(hero.getHealthPoint() + " " + creep.getHealthPoint()
+                           + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint() + " " + creep4.getHealthPoint());
     }
 }
 
@@ -81,7 +82,8 @@ class Tower implements Glyph {
     }
 
     public boolean inRadius(Unit target) {
-        return Math.sqrt(Math.pow(xCoordinate - target.getxCoordinate(), 2) + Math.pow(yCoordinate - target.getyCoordinate(), 2)) <= RADIUS;
+        return Math.sqrt(Math.pow(xCoordinate - target.getxCoordinate(), 2)
+                         + Math.pow(yCoordinate - target.getyCoordinate(), 2)) <= RADIUS;
     }
 
     public void attack(Unit[] units) {
@@ -301,3 +303,4 @@ class Hero extends Unit {
         }
     }
 }
+
