@@ -22,7 +22,8 @@ public class Dota {
         t4.attack(units);
         t4.attack(units);
         System.out.println(hero.getHealthPoint() + " " + creep.getHealthPoint()
-                           + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint() + " " + creep4.getHealthPoint());
+                           + " " + creep2.getHealthPoint() + " " + creep3.getHealthPoint()
+                           + " " + creep4.getHealthPoint());
     }
 }
 
@@ -303,4 +304,5 @@ class Hero extends Unit {
         }
     }
 }
+
 
